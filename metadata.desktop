@@ -1,0 +1,24 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PhabricatorPlasmoid
+Icon=chronometer
+Type=Service
+ServiceTypes=Plasma/Applet
+Comment=Widget to interact with Phabricator using Conduit API and QML/Javascript
+Keywords=service phabricator conduit api
+
+X-Plasma-API=declarativeappletscript
+X-Plasma-MainScript=package/contents/ui/main.qml
+X-Plasma-DefaultSize=380,200
+
+X-KDE-ServiceTypes=Plasma/Applet
+X-KDE-Library=plasma_applet_PhabricatorPlasmoid
+X-KDE-PluginInfo-Author=Enoque
+X-KDE-PluginInfo-Email=enoquejoseneas@gmail.com
+X-KDE-PluginInfo-Name=PhabricatorPlasmoid
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=plasma.kde.org
+X-KDE-PluginInfo-Category=Utilities
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=GPL
+X-KDE-PluginInfo-EnabledByDefault=true
