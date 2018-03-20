@@ -1,20 +1,36 @@
-# Phabricator Plasmoid
-a plasmoid to interact with [Phabricator] using [Conduit API] and [QML/Javascript]
+# phabricator-plasma-widget
+A Plasma widget for visualizing Phabricator data
 
-- the plasmoid can list the tasks and reviews and filter by project, user or reviewer
-- the plasmoid uses [QMl TabView] followed by settings tab with a form to configure the phabricator token, url and user email
-- the plasmoid refresh the list after some time that it's configurable in the settings tab
-- the plasmoid offers a button to force a update for tasks list and reviews
-- the plasmoid uses a local storage supported by qml using pure javascript functions.
-- the local storage it's placed in the user's home and can be opened using sqlite browser
+# Build instructions
 
- Tips and suggestions are welcome!
- 
-[//]: # (These are reference links used in the body)
+cd /where/your/applet/is/generated
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=MYPREFIX ..
+make
+make install
 
-[QML/Javascript]: <http://doc.qt.io/qt-5/qtqml-index.html>
-[Phabricator]: <https://www.phacility.com/>
-[QMl TabView]: <http://doc.qt.io/qt-5/qml-qtquick-controls-tabview.html>
-[git-repo-url]: <https://github.com/joemccann/dillinger.git>
-[Conduit API]: <https://secure.phabricator.com/book/phabricator/article/conduit/s>
-[local storage]: <http://doc.qt.io/qt-5/qtquick-localstorage-qmlmodule.html>
+(MYPREFIX is where you install your Plasma setup, replace it accordingly)
+
+Restart plasma to load the applet
+(in a terminal type:
+kquitapp plasmashell
+and then
+plasmashell)
+
+or view it with
+plasmoidviewer -a YourAppletName
+
+# Tutorials and resources
+The explanation of the template
+https://techbase.kde.org/Development/Tutorials/Plasma5/QML2/GettingStarted
+
+Plasma QML API explained
+https://techbase.kde.org/Development/Tutorials/Plasma2/QML2/API
+
+# To Install:
+cd phabricator-plasma-widget
+kpackagetool5 -t Plasma/Applet --install package
+
+# To update:
+kpackagetool5 -t Plasma/Applet --update package

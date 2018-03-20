@@ -1,134 +1,133 @@
-import QtQuick 2.6
-import QtQuick.Controls 1.5
+/***************************************************************************
+ *   Copyright (C) 2017 by Enoque Joseneas <enoquejoseneas@gmail.com>      *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
+ ***************************************************************************/
+
+import QtQuick 2.1
+import Qt.labs.settings 1.0
+import QtGraphicalEffects 1.0
+import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.1
-import QtQuick.Controls.Styles 1.4
+import org.kde.plasma.plasmoid 2.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
 
 Item {
-    z: 100
-    clip: true
-    visible: true
-    width: initialPlasmoidWidth
-    height: initialPlasmoidHeight
-    anchors.horizontalCenter: parent.horizontalCenter
+    id: rootItem
+    Plasmoid.title: qsTr("Phabricator Widget")
+    width: 450; height: 350
+    implicitWidth: width; implicitHeight: height
+    Layout.minimumWidth: width; Layout.minimumHeight: height
 
-    property alias user: __user
-    property alias project: __project
-    property alias storage: __storage
-    property alias settingsApi: __settingsApi
-    property alias requesterApi: __requesterApi
-    property alias labelWarnings: __labelWarnings
 
-    property string version: "1.0"
-    property string client: "qml-phabricator-client"
+    // the widget persistence data (token, user id and phabricator url)
+    Settings {
+        id: settings
+        objectName: "Phabricator Widget"
 
-    property real initialPlasmoidWidth: parent.width * 0.999
-    property real initialPlasmoidHeight: parent.height * 0.999
+        property string phabricatorUrl
+        property string projectId
+        property string token
+        property string useremail
+        property string userPhabricatorId
+        property int updateCheckInterval
+        property var projectList
 
-    function setResponseErrorMessage(message) {
-        labelWarnings.color = "red";
-        labelWarnings.text  = message ? "Error: %1".arg(message) : qsTr("Error on load data from phabricator!");
-    }
+        signal ready()
 
-    Storage {
-        id: __storage
-    }
-
-    RequesterApi {
-        id: __requesterApi
-    }
-
-    User {
-        id: __user
-    }
-
-    SettingsApi {
-        id: __settingsApi
-    }
-
-    Project {
-        id: __project
-    }
-
-    ColumnLayout {
-        width: parent.width; height: parent.height
-
-        Tabs {
-            id: __tabs
-            z: 10
-            width: parent.width; height: parent.height - __messageSection.height * 2
-        }
-
-        Rectangle {
-            id: __messageSection
-            z: 11
-            width: parent.width; height: parent.height * 0.075
-            anchors.bottom: __tabs.bottom
-            color: "#fff"
-            border.color: "#bbb"
-
-            Timer {
-                id: __labelWarningDisplayTimer
-                running: __labelWarnings.text.length
-                repeat: false
-                interval: 5000
-                onTriggered: {
-                    __labelWarnings.text  = ""
-                    __labelWarnings.color = "#41506e";
-                }
-            }
-
-            RowLayout {
-                anchors.fill: parent
-                spacing: 5
-
-                BusyIndicator {
-                    id: __progressIndicator
-                    width: 16; height: 16
-                    implicitWidth: 16; implicitHeight: 16
-                    anchors.left: parent.left
-                    anchors.leftMargin: parent.width * 0.01
-                    running: requesterApi.state === "running"
-                    NumberAnimation on opacity {
-                        from: 0
-                        to: 1
-                        duration: 1500
-                    }
-                }
-
-                Text {
-                    id: __labelWarnings
-                    width: parent.width * 0.70
-                    anchors.left: __progressIndicator.running ? __progressIndicator.right : parent.left
-                    anchors.leftMargin: parent.width * 0.01
-                    text: requesterApi.requestMessage
-                    color: "#41506e"
-                    font.pixelSize: 11
-                    NumberAnimation on opacity {
-                        from: 0
-                        to: 1
-                        duration: 800
-                    }
-                }
-
-                Button {
-                    id: __forceReload
-                    width: 24; height: 24
-                    iconSource: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAtFBMVEX///8ZMUIZMkEZMUIYMUIYMUIXMEMVK0AZMkEYMUIYMUIYMUIYMUIXMEIYMUIYMUIXMUIXMUEYMT0AAAAYMUIYMUIXMEEAVVUXMUEYMUMWLEMYMUIYMkIYMUIaM0IYMUIYMUIWM0IYMUIYMkMVNUAXMUIYMUMYMUIYMUIYMkIYMEMYMUIYMUMYMEEAQEAYMEEYMkIYMEEYMUIYMUEgQEAZMkIYMUIYMUIYMUERM0QYMUIAAAA3xMoEAAAAOnRSTlMAH3Gl2bJvDGbz46t3hMb772IVAa35eQOYcxfUbPcy/uoj9XYY5H7c159fiOZqBIm+S/xeCJDx27cPXE/KmwAAAAFiS0dEEwy7XJYAAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfgBgUDCR88grxVAAAAi0lEQVQY02WP1xKCQAxFjwpiwYpSbKDYu9j3/z9MdpSdZTxPuXeS3ARSCsWSYZhlix+Vaq1uN5qtdge64PT6rid9yxfBYAij8SRrdcNIMJ3FmWa+EILlylN6LVLD3KiG7S6F/YE8f4Y28kVbCkeHXCynM7nDLskV7fSbndy15wI/eqhA+f7zFb9l/QE2Vwwtdfi7BQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNi0wNi0wNVQwMzowOTozMSswMjowMCwjUJIAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTYtMDYtMDVUMDM6MDk6MzErMDI6MDBdfuguAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAABJRU5ErkJggg=="
-                    enabled: __tabs.currentIndex !== 3 && requesterApi.state !== "running"
-                    text: qsTr("Update")
-                    anchors.right: parent.right
-                    anchors.rightMargin: parent.width * 0.01
-                    onClicked: __tabs.getTab(__tabs.currentIndex).item.loadDataFromApi()
-                }
-            }
-
-            MouseArea {
-                hoverEnabled: true
-                width: parent.width - __forceReload.width; height: parent.height
-                onEntered: labelWarnings.text = ""
+        Component.onCompleted: {
+            Plasmoid.fullRepresentation = column
+            if (!token || !useremail || !phabricatorUrl) {
+                tabGroup.currentTab = settingsPage
+                tabBar.currentTab = settingsPageButton
+            } else {
+                ready()
             }
         }
+    }
+
+    // the request http object
+    JSONListModel {
+        id: jsonModel
+        source: settings.phabricatorUrl
+        requestMethod: "POST"
+        // reset url after each request response
+        onStateChanged: if (state === "ready" || state === "error") jsonModel.source = settings.phabricatorUrl
+    }
+
+    // show system notification for new events
+    Notification {
+        id: systemTrayNotification
+    }
+
+    Column {
+        id: column
+        spacing: 2; width: parent.width; anchors.fill: parent
+
+        Row {
+            width: parent.width; height: tabBar.height
+
+            PlasmaComponents.TabBar {
+                id: tabBar
+                z: parent.z + 100; clip: true; width: parent.width
+
+                PlasmaComponents.TabButton {
+                    tab: maniphestPage
+                    text: qsTr("Maniphest")
+                    clip: true
+                }
+
+                PlasmaComponents.TabButton {
+                    id: settingsPageButton
+                    tab: settingsPage
+                    text: qsTr("Settings")
+                    clip: true
+                }
+
+                PlasmaComponents.TabButton {
+                    tab: aboutPhabricatorPage
+                    text: qsTr("About Phabricator")
+                    clip: true
+                }
+            }
+        }
+
+        PlasmaComponents.TabGroup {
+            id: tabGroup
+            clip: true
+            width: parent.width; height: parent.height - tabBar.height
+
+            ManiphestPage {
+                id: maniphestPage
+            }
+
+            SettingsPage {
+                id: settingsPage
+            }
+
+            AboutPhabricatorPage {
+                id: aboutPhabricatorPage
+            }
+        }
+    }
+
+    PlasmaComponents.BusyIndicator {
+        width: 32; height: width
+        visible: jsonModel.state === "loading"
+        anchors { bottom: parent.bottom; right: parent.right; margins: 5 }
     }
 }
