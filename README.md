@@ -28,9 +28,12 @@ https://techbase.kde.org/Development/Tutorials/Plasma5/QML2/GettingStarted
 Plasma QML API explained
 https://techbase.kde.org/Development/Tutorials/Plasma2/QML2/API
 
-# To Install:
+To install:
 cd phabricator-plasma-widget
 kpackagetool5 -t Plasma/Applet --install package
 
-# To update:
-kpackagetool5 -t Plasma/Applet --update package
+To upgrade:
+kpackagetool5 -t Plasma/Applet --upgrade package
+
+To test:
+plasmawindowed org.kde.plasma.phabricator

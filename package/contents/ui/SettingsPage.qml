@@ -127,7 +127,7 @@ PlasmaComponents.Page {
 
             PlasmaComponents.TextField {
                 id: updateCheckIntervalField
-                text: 50000 + ""
+                placeholderText: qsTr("Default is 5 minutes")
                 anchors { left: parent.left; right: parent.right; margins: 15 }
                 onTextChanged: if (text) settings.updateCheckInterval = parseInt(text)
             }
