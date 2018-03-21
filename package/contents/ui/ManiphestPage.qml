@@ -149,6 +149,8 @@ PlasmaComponents.Page {
         visible: !preview.visible
         clip: true; spacing: 0
         ScrollIndicator.vertical: ScrollIndicator { }
+        onDragEnded: if (header.refresh) { maniphestPageRequest() }
+
         delegate: Rectangle {
             clip: true; color: "transparent"
             width: parent.width; height: 50
@@ -210,5 +212,11 @@ PlasmaComponents.Page {
             // Add a separator to list items
             Rectangle { anchors.bottom: parent.bottom; width: parent.width; height: 1; color: taskTitle.color; opacity: 0.2 }
         }
+
+        ListHeader {
+            id: header
+            y: -maniphestView.contentY - height
+            yPosition: maniphestView.contentY
+        }
     }
-} 
+}
