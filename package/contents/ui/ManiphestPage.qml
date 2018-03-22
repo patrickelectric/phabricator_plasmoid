@@ -98,7 +98,7 @@ PlasmaComponents.Page {
             jsonModel.load(function(response) {
                 if (jsonModel.httpStatus == 200 && response.result && response.result.data.length) {
                     preview.previewObject = response.result.data[0]
-                    preview.visible = true
+                    preview.visible = true                    
                 }
             })
         }
@@ -127,18 +127,69 @@ PlasmaComponents.Page {
             spacing: 20
             width: parent.width * 0.90
             anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 30 }
+            Column {
+              width: parent.width * 0.90
 
-            PlasmaComponents.Label {
-                id: detailTextLabel
-                width: parent.width
-                elide: Text.ElideRight
-                text: preview.previewObject.fields.name
+              PlasmaComponents.Label {
+                  id: detailTextLabel
+                  width: parent.width
+                  font.bold: true
+                  font.pointSize: 15
+                  text: preview.previewObject.fields.name
+              }
             }
 
-            PlasmaComponents.Label {
-                width: parent.width
-                elide: Text.ElideRight
-                text: typeof preview.previewObject.description != "undefined" ? preview.previewObject.description.raw : ""
+            Column {
+              width: parent.width * 0.90
+              spacing: 0
+
+              PlasmaComponents.Label {
+                  width: parent.width
+                  color: "#6B748C"
+                  font.pointSize: 13
+                  text: "Description:"
+              }
+
+              PlasmaComponents.TextArea {
+                  width: parent.width
+                  height: 200
+                  text: preview.previewObject.fields.description && preview.previewObject.fields.description.raw ? preview.previewObject.fields.description.raw : ""
+                  readOnly: true
+              }
+            }
+
+            Column {
+              width: parent.width * 0.90
+              spacing: 0
+
+              PlasmaComponents.Label {
+                  width: parent.width
+                  color: "#6B748C"
+                  font.pointSize: 13
+                  text: "Status:"
+              }
+
+              PlasmaComponents.Label {
+                  width: parent.width
+                  text: preview.previewObject.fields.status && preview.previewObject.fields.status.name ? preview.previewObject.fields.status.name : ""
+              }
+            }
+
+            Column {
+              width: parent.width * 0.90
+              spacing: 0
+
+              PlasmaComponents.Label {
+                  width: parent.width
+                  color: "#6B748C"
+                  font.pointSize: 13
+                  text: "Priority:"
+              }
+
+              PlasmaComponents.Label {
+                  width: parent.width
+                  text: preview.previewObject.fields.priority && preview.previewObject.fields.priority.name ? preview.previewObject.fields.priority.name : ""
+              }
             }
         }
     }
